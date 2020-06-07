@@ -58,9 +58,10 @@ export default {
               location.params = {keyword}
               location.query = {keyword2:keyword.toUpperCase()}
           }
-          this.$router.push(location).catch(() =>{
+          // this.$router.push(location).catch(() =>{
 
-          })
+          // })
+          this.$router.push(location)
            this.keyword = ''
       }
      

@@ -25,6 +25,7 @@ export default[
     {
         name:'search',
         path:'/search/:keyword?',
-        component:Search
+        component:Search,
+        props: route => ({keyword3:route.params.keyword,keyword4:route.query.keyword2})
     },
 ]
