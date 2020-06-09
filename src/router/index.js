@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import vueRouter from 'vue-router'
+import VueRouter from 'vue-router'
 import routes from './routes'
-Vue.use(vueRouter)
+Vue.use(VueRouter)
 
 // 保存原本的push函数
 const originPush = VueRouter.prototype.push
@@ -18,7 +18,7 @@ VueRouter.prototype.push = function (location,onComplete,onAbort){
   }
 }
 
-VueRouter.prototype.push = function (location,onComplete,onAbort){
+VueRouter.prototype.replace = function (location,onComplete,onAbort){
   // 这里的this是VueRouter
   if(!onComplete && !onAbort){
     return originReplace.call(this,location).catch(error =>{
@@ -29,7 +29,7 @@ VueRouter.prototype.push = function (location,onComplete,onAbort){
   }
 }
 // 向外暴露
-export default new vueRouter({
+export default new VueRouter({
   mode:'history',
   routes
 })

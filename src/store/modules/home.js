@@ -1,16 +1,22 @@
 // 管理首页数据的vuex子模块
 // 首页三级列表
-import {reqCategoryList} from '@/api'
+import {reqCategoryList,reqBanners,reqFloors,reqTodays} from '@/api'
 // 暴露
 export default {
     state:{
         categoryList:[],//分类列表
-        xxx:{},
-        yyy:'xiaotian'
+        banners:[],
+        floors:[],
+        todays:[]
     },
     mutations:{
-        test1(state){
-            
+        // 接受保存广告轮播图
+        RECEIVE_BANNERS(state,banners){
+            state.banners = banners
+        },
+        // 接受保存楼层列表
+        RECEIVE_FLOORS(state,floors){
+            state.floors = floors
         },
         // 接收保存分类列表的mutation
         RECEIVE_CATEGORY_LIST(state,categoryList){
@@ -18,8 +24,27 @@ export default {
         }
     },
     actions:{
-        test3({commit,state}){
-
+        
+        async getBanners ({commit}){
+            const result = await reqBanners()
+            if(result.code === 200){
+                const banners = result.data
+                commit('RECEIVE_BANNERS',banners)
+            }
+        },
+        async getFloors ({commit}){
+            const result = await reqFloors()
+            if(result.code === 200){
+                const floors = result.data
+                commit('RECEIVE_FLOORS',floors)
+            }
+        },
+        async reqTodays ({commit}){
+            const result = await reqTodays()
+            if(result.code === 200){
+                const todays = result.data
+                commit('RECEIVE_Todays',todays)
+            }
         },
         // 获取分类列表的异步actions
         async getCategoryList ({commit}){

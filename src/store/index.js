@@ -1,8 +1,9 @@
 import Vue from 'vue'
 // vuex 最核心的管理对象：store(仓库)
 import Vuex from 'vuex'
-import home from './modules/home'
-import user from './modules/user';
+// import home from './modules/home'
+// import user from './modules/user';
+import modules from './modules'
 Vue.use(Vuex)
 
 // const state ={}
@@ -11,7 +12,11 @@ const mutations ={
 
     }
 }
-const actions ={}
+const actions ={
+    xxx({commit,state}){
+        
+    }
+}
 const getters ={}
 // 向外暴露
 export default new Vuex.Store({
@@ -21,8 +26,5 @@ export default new Vuex.Store({
     actions,
     getters,
     // 指定vuex管理所有的子模块
-    modules: {
-        home,
-        user
-    }
+    modules
 })
