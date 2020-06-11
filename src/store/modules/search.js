@@ -20,8 +20,13 @@ const actions = {
 }
 
 const getters = {
+    // 品牌列表
     trademarkList (state){
         return state.productList.trademarkList || []
+    },
+    // 属性列表
+    attrsList(state){
+        return state.productList.attrsList || []
     }
 }
 export default {

@@ -11,30 +11,34 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">
-              iphone
-              <i>×</i>
+            <li class="with-x" v-if="options.categoryName">
+              {{options.categoryName}}<i @click="removeCategory">×</i></li>
+            <li class="with-x" v-if="options.keyword">
+              {{options.keyword}}
+              <i @click="removeKeyword">×</i>
             </li>
-            <li class="with-x">
-              华为
-              <i>×</i>
+            <li class="with-x" v-if="options.trademark">
+              {{options.trademark}}
+              <i @click="removeTrademark">×</i>
             </li>
-            <li class="with-x">
-              OPPO
-              <i>×</i>
+            <li class="with-x" v-for="(prop,index) in options.props" :key="prop">
+              {{prop}}<i @click="removeProp(index)">×</i>
             </li>
           </ul>
         </div>
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector :setTrademark="setTrademark" @addProp="addProp"/>
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{active:isActive('1')}" @click="setOrder('1')">
+                  <a href="#">
+                    综合
+                    <i class="iconfont" v-if="isActive('1')"
+                    :class="iconClass"></i>
+                    </a>
                 </li>
                 <li>
                   <a href="#">销量</a>
@@ -45,12 +49,15 @@
                 <li>
                   <a href="#">评价</a>
                 </li>
-                <li>
-                  <a href="#">价格⬆</a>
+                <li :class="{active:isActive('2')}" @click="setOrder('2')">
+                  <a href="javascript:">
+                    价格
+                    <i class="iconfont" v-if="isActive('2')" :class="iconClass"></i>
+                    </a>
                 </li>
-                <li>
+                <!-- <li>
                   <a href="#">价格⬇</a>
-                </li>
+                </li> -->
               </ul>
             </div>
           </div>
@@ -59,7 +66,7 @@
               <li class="yui3-u-1-5" v-for="item in productList.goodsList" :key="item.id">
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javescript:">
+                    <a href="javascript:">
                       <img :src="item.defaultImg" />
                     </a>
                   </div>
@@ -90,39 +97,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted">
-                  <span>...</span>
-                </li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div>
-                <span>共10页&nbsp;</span>
-              </div>
-            </div>
-          </div>
+          <Pagination
+            :currentPage="options.pageNo"
+            :pageSize="options.pageSize"
+            :total="productList.total"
+            :showPageNo="5"
+            @currentChange="getProductList"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -130,6 +111,7 @@
 </template>
 
 <script type="text/ecmascript-6">
+import Vue from 'vue'
 import { mapState } from "vuex";
 import SearchSelector from "./SearchSelector/SearchSelector";
 export default {
@@ -148,20 +130,115 @@ export default {
         order: "1:desc", // 排序方式  1: 综合,2: 价格 asc: 升序,desc: 降序  "1:desc"
 
         pageNo: 1, // 页码
-        pageSize: 5 //	每页数量
+        pageSize: 2 //	每页数量
       }
     };
   },
   created() {
+    // 根据query和params参数更新options
+    this.updateOptions()
+    // 发送搜索请求
     this.getProductList();
   },
   computed: {
     ...mapState({
       productList: state => state.search.productList
-    })
+    }),
+    iconClass(){
+      return this.options.order.split(':')[1] ==='asc' ? 'iconup' : 'icondown'
+    }
+  },
+  watch: {
+    $route(to,from){
+    // 根据query和params参数更新options
+      this.updateOptions()
+    // 发送搜索请求
+      this.getProductList()
+    }
   },
   methods: {
-    getProductList() {
+    // 设置新的排序
+    setOrder(flag){
+      // 取出原本的orderFlag,orderType
+      let [orderFlag,orderType] = this.options.order.split(':')
+      // 点击当前排序项：切换排序方式
+      if(flag===orderFlag){
+        orderType = orderType ==='asc' ? 'desc' : 'asc'
+
+      }else{
+        orderFlag = flag
+        orderType = 'desc'
+      }
+      // 更新order
+      this.options.order = orderFlag + ':' + orderType
+      // 重新获取请求
+      this.getProductList()
+    },
+    // 判断指定的flag对应的项是否选中
+    isActive(orderFlag){
+      return this.options.order.indexOf(orderFlag)===0
+    },
+    // 删除属性条件
+    removeProp(index){
+      // 删除对应的属性条件
+      this.options.props.splice(index,1)
+      // 重新发送请求
+      this.getProductList()
+    },
+    addProp(prop){
+      // 如果这个属性存在直接结束
+      if(this.options.props.indexOf(prop)>0) return
+      // 想props添加prop
+      this.options.props.push(prop)
+      // 重新发送请求
+      this.getProductList()
+    },
+    removeTrademark(){
+      // 清除品牌数据
+      Vue.delete(this.options,'trademark')
+      this.getProductList()
+    },
+    // 设置新的品牌
+    setTrademark(trademark){
+      // 如果已经有当前品牌条件数据，直接结束
+      if(this.options.trademark===trademark) return
+
+      // 更新品牌数据
+
+      
+      // this.options.trademark = trademark
+      Vue.set(this.options,'trademark',trademark)
+      // 重新获取请求
+      this.getProductList()
+    },
+    removeCategory(){
+      // 重置相关数据
+      this.options.categoryName = ''
+      this.options.category1Id = ''
+      this.options.category2Id = ''
+      this.options.category3Id = ''
+      this.$router.replace({name:'search',params:this.$route.params})
+    },
+    removeKeyword(){
+      // 重新请求列表数据
+      this.options.keyword =''
+      this.$router.replace({name:'search',query:this.$route.query})
+      this.$bus.$emit('removeKeyword')
+    },
+    updateOptions() {
+      const {categoryName='',category1Id='',category2Id='',category3Id=''} = this.$route.query
+      const {keyword=''} = this.$route.params
+      this.options = {
+        ...this.options,
+        categoryName,
+        category1Id,
+        category2Id,
+        category3Id,
+        keyword
+      }
+    },
+    getProductList(pageNo=1) {
+      this.options.pageNo = pageNo
       this.$store.dispatch("getProductList", this.options);
     }
   },

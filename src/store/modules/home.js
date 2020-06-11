@@ -10,6 +10,9 @@ export default {
         todays:[]
     },
     mutations:{
+        RECEIVE_TODAYS (state,todays){
+            state.todays = todays
+        },
         // 接受保存广告轮播图
         RECEIVE_BANNERS(state,banners){
             state.banners = banners
@@ -39,11 +42,11 @@ export default {
                 commit('RECEIVE_FLOORS',floors)
             }
         },
-        async reqTodays ({commit}){
+        async getTodays ({commit}){
             const result = await reqTodays()
             if(result.code === 200){
                 const todays = result.data
-                commit('RECEIVE_Todays',todays)
+                commit('RECEIVE_TODAYS',todays)
             }
         },
         // 获取分类列表的异步actions

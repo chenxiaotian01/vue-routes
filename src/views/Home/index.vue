@@ -31,6 +31,7 @@ export default {
         // 分发给异步action请求获取楼层列表
         this.$store.dispatch('getFloors')
         this.$store.dispatch('getBanners')
+        this.$store.dispatch('getTodays')
     },
     components:{
         ListContainer,
