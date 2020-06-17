@@ -10,6 +10,14 @@ import Detail from '@/pages/Detail'
 import AddCartSuccess from '@/pages/AddCartSuccess'
 import ShopCart from '@/pages/ShopCart'
 
+import Trade from '@/pages/Trade'
+import Pay from '@/pages/Pay'
+import PaySuccess from '@/pages/PaySuccess'
+import Center from '@/pages/Center'
+
+import MyOrder from '@/pages/Center/MyOrder'
+import Group from '@/pages/Center/Group';
+
 export default [
   {
     path: '/',
@@ -49,5 +57,35 @@ export default [
   {
     path:'/shopcart',
     component:ShopCart
+  },
+  {
+    path:'/trade',
+    component:Trade
+  },
+  {
+    path:'/pay',
+    component:Pay
+  },
+  {
+    path:'/paysuccess',
+    component:PaySuccess
+  },
+  {
+    path:'/center',
+    component:Center,
+    children:[
+      {
+        path:'/center/myorder',
+        component:MyOrder,
+      },
+      {
+        path:'group',
+        component:Group,
+      },
+      {
+        path:'',
+        redirect:'/center/myorder'
+      }
+    ]
   }
 ]

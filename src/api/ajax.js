@@ -13,6 +13,7 @@ axios的二次封装(axios本身就是对XHR原生ajax的封装)     面试必�
 */
 import axios from 'axios'
 import NProgress from 'nprogress'
+import store from '@/store'
 
 /* 1. 配置通用的基础路径和超时 */
 // instance是一个与axios功能类似的ajax请求函数
@@ -27,7 +28,8 @@ const instance = axios.create({
 instance.interceptors.request.use(config => { // 在真正发送请求前执行
   /* 2.1 在请求拦截器回调中执行: NProgress.start() */
   NProgress.start()
-
+  
+  config.headers['userTempId'] = store.state.user.userTempId
   return config
 })
 
